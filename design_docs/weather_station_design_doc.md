@@ -60,7 +60,7 @@ Every unit should be client to a single server, and multiple units should access
 
 The core unit of each module consists of an Arduino Uno/Mega, paired with a compatible ethernet shield and SD card reader. Attached serially to the Arduino are a number of peripheral sensors and devices, which provide environmental measurements using SPI protocol. All peripherals are hardwired into the main control and the entire unit is housed in custom modeled housing printed in PLA.
 
-Voltage is provided to the sensors via the Arduino, the input to which should be 7-12 V. Using an onboard voltage regulator, the Arduino is able to appropriately power a number of devices concurrently, giving each its necessary amperage. See the schematics folder for [wiring diagrams](schematics/wiring/) and [3D models](schematics/models/).
+Voltage is provided to the sensors via the Arduino, the input to which should be 7-12 V. Using an onboard voltage regulator, the Arduino is able to appropriately power a number of devices concurrently, giving each its necessary amperage. See the schematics folder for [wiring diagrams](../schematics/wiring/) and [3D models](../schematics/models/).
 
 #### Onboard Software Specifications
 
