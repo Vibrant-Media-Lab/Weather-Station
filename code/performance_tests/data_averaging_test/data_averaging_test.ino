@@ -135,17 +135,17 @@ void updateData() {
 }
 
 void displayData() {
-  if(temperature != NaN) {
+  if(recordingTmp) {
     Serial.print(F("Temperature = "));
     Serial.print(temperature);
     Serial.println(" *C");
   }
-  if(humidity != NaN) {
+  if(recordingRH) {
     Serial.print(F("Relative Humidity = "));
     Serial.print(humidity);
     Serial.println(" %");
   }
-  if(pressure != NaN) {
+  if(recordingBP) {
     Serial.print(F("Air Pressure = "));
     Serial.print(pressure);
     Serial.println(" Pa");
