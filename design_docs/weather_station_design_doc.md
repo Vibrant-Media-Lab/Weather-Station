@@ -1,7 +1,7 @@
 # Arduino Weather Station
 ## Design Document
 
-##### Joshua Arabia, Pitt Vibrant Media Lab
+##### Pitt Vibrant Media Lab
 
 
 ### Introduction
