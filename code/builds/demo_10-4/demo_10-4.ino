@@ -30,7 +30,7 @@ Adafruit_BMP280 pressureSensor;
 #define rainRatePin (16)
 
 #define windSpeedPin (18)
-#define windHeadingPin (A15)
+#define windHeadingPin (69)
 
 #define SD_CARD_SS_PIN (4)
 
@@ -95,11 +95,37 @@ void setup() {
   //beginEnet();
   beginSensors();
   updateData();
-  writeToSD();
 }
 
 void loop() {
+  frameStart = millis();
 
+  if(_dataUpdateTime <= 0) {
+    updateData();
+    serializeData(Serial);
+    Serial.println("");
+    _dataUpdateTime = dataUpdateTime;
+  }
+
+  if(_dataWriteTime <= 0) {
+    if(hasSD) writeToSD();
+    _dataWriteTime = dataWriteTime;
+  }
+
+  if(_dataUploadTime <= 0) {
+    //if(hasEnet) uploadData();
+    _dataUploadTime = dataUploadTime;
+  }
+
+  long delayTime = 1000 - (millis() - frameStart);
+  if(delayTime > 0) delay(delayTime);
+  //End of frame operations
+  if(millis() >= frameStart) frameLength = millis() - frameStart;
+  else frameLength = millis() + (unsigned long)(0x7FFFFFFF - frameStart);
+
+  _dataUploadTime -= frameLength;
+  _dataWriteTime -= frameLength;
+  _dataUpdateTime -= frameLength;
 }
 
 // Initialize Components //
@@ -166,7 +192,7 @@ void updateData() {
   if(hasSi) updateHumidity();
   updateAirQuality();
   updateWindHeading();
-  //updateWindSpeed();
+  updateWindSpeed();
 }
 
 /**
@@ -204,12 +230,12 @@ void updateHumidity() {
  * Return: None
  */
 void updateAirQuality() {
-	if(readPMSdata(&aqSerial)) {
-		uint16_t tempData[6] = {aq.particles_03um, aq.particles_05um, aq.particles_10um, aq.particles_25um, 
-                        aq.particles_50um, aq.particles_100um};
-	   for(int i = 0; i < 6; i++) {
+  if(readPMSdata(&aqSerial)) {
+	   uint16_t tempData[6] = {aq.particles_03um, aq.particles_05um, aq.particles_10um, aq.particles_25um, 
+                                aq.particles_50um, aq.particles_100um};
+	 for(int i = 0; i < 6; i++) {
 	      data.airQuality[i] = tempData[i];
-	   }
+	 }
 	}
 }
 
@@ -287,9 +313,11 @@ void updateWindSpeed() {
   pinMode(windSpeedPin, INPUT);
   attachInterrupt(digitalPinToInterrupt(windSpeedPin), isr_rotation, FALLING);
   
-  sei();      // Begin critical section
-    delay(1000);
-  cli();      // End critical section
+  int i = 1000;
+  while(i >= 0) {
+    unsigned long start = millis();
+    i -= (millis() - start);
+  }
   
   detachInterrupt(digitalPinToInterrupt(windSpeedPin));
   data.windSpeed = windInterruptCounter * .75;
@@ -316,7 +344,16 @@ void isr_rotation() {
  */
 void writeToSD() {
   serializeData(logFile);
-  serializeData(Serial);
+}
+
+/**
+ * Write json data out through the ethernet connection
+ * to an external webClient
+ * Arguments: None
+ * Return: None
+ */
+void uploadData() {
+
 }
 
 /**
