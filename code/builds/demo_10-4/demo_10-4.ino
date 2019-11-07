@@ -88,6 +88,11 @@ bool hasBmp;
 bool hasSD;
 bool hasEnet;
 
+// Network //
+byte mac[] = {0x2c, 0x77, 0x68, 0xc4, 0x91, 0x85};
+IPAddress ip();
+EthernetServer server(80);
+
 
 void setup() {
   beginSerial();
@@ -157,7 +162,7 @@ void beginSerial() {
  */
 void beginSD() {
   if(SD.begin(SD_CARD_SS_PIN)) {
-    logFile = SD.open("log.dat", FILE_WRITE);
+    logFile = SD.open("log.txt", FILE_WRITE);
     hasSD = 1;
   } else {
     hasSD = 0;
@@ -165,7 +170,41 @@ void beginSD() {
 }
 
 void beginEnet() {
+  Ethernet.begin(mac, ip);
+  server.begin();
+}
 
+/**
+ * Finds the ethernet
+ *
+ *
+ *
+ */
+void findEthernetClient() {
+  EthernetClient client = server.available();
+  if(client) {
+    bool requestEnded = true;
+    while(client.connected()) {
+      if(client.available()) {
+        char c = client.read();
+
+        if(c == '\n' && requestEnded) {
+          serializeData(client);
+          break;
+        }
+
+        if(c == '\n') {
+          requestEnded = true;
+        } else if(c != '\r') {
+          requestEnded = false;
+        }
+      }
+    }
+
+    delay(10);
+    client.flush();
+    client.stop();
+  }
 }
 
 /**
@@ -344,6 +383,8 @@ void isr_rotation() {
  */
 void writeToSD() {
   serializeData(logFile);
+  logFile.println("");
+  logFile.flush();
 }
 
 /**
