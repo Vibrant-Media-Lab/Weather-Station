@@ -15,88 +15,99 @@
         //run into sync problems getting from wStation.py every hour as well?
         //could have them refresh themselves, say when the last time is was refreshed 
         //the could be sync issues here, doing every 60 minutes if they are offsset and servers are run at different times 
+        
+        var buffd;
+        
         function getWeather(){
-            var xhttp = new XMLHttpRequest();
+
+            console.log("Get weather");
+
+            $.ajax({
+                type : "GET",
+                dataType: "json",
+                url : 'http://127.0.0.1:5000/get_data',
+                success: function (data) {
+                    //data = JSON.parse(data);
+                    console.log("gotten");
+                    //console.log(data);
+                    attach(data);
+                    //buffd = JSON.parse(data);
+                    //console.log(buffd);
+                    //return data;
+                }, error: function(e){
+                    console.log(e);
+                }
+	        });
+            /*var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if(this.readyState == 4 && this.status == 200){
-                    var currWeatherData = JSON.parse(xhttp.responseText);
+                    var currData = JSON.parse(xhttp.responseText);
                 }
             };
             xhttp.open("GET", "/get_data", true);
+            xhttp.send(); */
+        }
+
+        function attach(data){
+            buffd = data;
+            //console.log(buffd)
+        }
+
+        function getHist(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200){
+                    var histoWeatherData = JSON.parse(xhttp.responseText);
+                }
+            };
+            xhttp.open("GET", "/get_histo", true);
             xhttp.send();
         }
 
-        var currWeatherData = [
-            {
-                "Temperature": 1,
-                "pressure": "thing",
-                "humidity": "thing",
-                "Air Quality ": "thing",
-                "Wind Speed": "thing",
-                "Wind Heading": "thing",
-                "Rain Rate": "thing"
-
-            }
-
-        
-            
-        ];
-
-        var exampleHistWeatherD = [
-            {
-                "Temperature": 1,
-                "pressure": "thing",
-                "humidity": "thing",
-                "Air Quality ": "thing",
-                "Wind Speed": "thing",
-                "Wind Heading": "thing",
-                "Rain Rate": "thing"
-            },
-            {
-                "Temperature": 1,
-                "pressure": "thing",
-                "humidity": "thing",
-                "Air Quality ": "thing",
-                "Wind Speed": "thing",
-                "Wind Heading": "thing",
-                "Rain Rate": "thing"
-            },
-            {
-                "Temperature": 1,
-                "pressure": "thing",
-                "humidity": "thing",
-                "Air Quality ": "thing",
-                "Wind Speed": "thing",
-                "Wind Heading": "thing",
-                "Rain Rate": "thing"
-            }
-        ]
-
         function createTables(){
+            //var weath = getWeather();
+            //console.log(weath)
+
+            getWeather();
+
+            //console.log(buffd)
+            var weath = buffd;
+
+            //var exampleHistWeatherD = getHist();
+
             //list of values
-            var props = Object.getOwnPropertyNames(currWeatherData[0]);
-            console.log(props);
-            console.log(currWeatherData[0].length);
-            console.log(currWeatherData)
+            var props = Object.getOwnPropertyNames(weath);
+            //console.log(props);
+           
+            console.log(weath)
+
+            document.getElementById("currentweather").innerHTML = "";
             
             for(var i = 0; i < props.length; i++){
+                //if already exists
+
+                
+
                 var listItem = document.createElement("li");
+
+                listItem.id = "weatherItems"
 
                 listItem.className = "list-group-item";
                 
                 
-                listItem.innerHTML = props[i] + ": " + currWeatherData.pressure; 
+                listItem.innerHTML = props[i] + ": " + weath[props[i]]; 
 
                 curtable.appendChild(listItem);
 
                 
             }
 
-            createHistoricalTable();
+            //createHistoricalTable();
 
            
         }
 
+       
        
 
         function createHistoricalTable(){
@@ -162,9 +173,12 @@
                             <select>
                                     <!--On selection display table-->
                                     <option selected disabled>Station Select</option>
-                                    <option value="1" onclick=createTables()>Default Station</option>
+                                    <option value="1">Default Station</option>
                                     
                                 </select>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-primary" onclick=createTables()>Load Data/Refresh</button>
                     </li>
                   </ul>
                  <!--Status button-->
@@ -181,6 +195,23 @@
         </div>
         <div id="right"><h1 class="display-4">Historical Readings</h1>
             <table class="table" id = "historical"> </table>
+
+            <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-reponsive-item" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQvER8gp0sAJKSCMLXnwhGDOobi3rJGtQ2EVLJT9HMHeOFufzFymY1efkkkFtsvaRgxQU_hyJKSzqDC/pubhtml?widget=true&amp;headers=false"></iframe>
+            </div>
+
+            <br />
+
+
+            <div class="embed-responsive embed-responsive-16by9">
+                <a class="embed-responsive-item" href="https://www.wunderground.com/dashboard/pws/KPAPITTS391"><img src="http://banners.wunderground.com/cgi-bin/banner/ban/wxBanner?bannertype=pws250&weatherstationcount=KPAPITTS391" width="400" height="200" border="0" alt="Weather Underground PWS KPAPITTS391" /></a>
+
+            </div>
+
+            
+
+
+
         </div>
         <div id="bot"><p>Connor Lovejoy for VML Pitt</p></div>
         <!-- use function from home.html to add data to table dynamically, also have this run every hour-->
@@ -189,7 +220,7 @@
             var curtable = document.getElementById("currentweather");
             var histo = document.getElementById("historical");
 
-            createTables();
+            //createTables();
            // createHistoricalTable();
         
         </script>
