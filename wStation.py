@@ -1,15 +1,74 @@
 from flask import Flask, render_template, request, session, url_for, redirect, abort
 import json
 import os 
+import time
+import atexit
+
+import gspread
+import datetime
+from oauth2client.service_account import ServiceAccountCredentials
+
+from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
+
+# use creds to create a client to interact with the Google Drive API
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+client = gspread.authorize(creds)
+
+# Find a workbook by name and open the first sheet
+# Make sure you use the right name here.
+sheet = client.open("VML WeatherStation Historical Data").sheet1
+
+
 
 #need to send name
 #have status default to zero 
 exampleData = {
-    "temp" : 34,
-    "pressure" : 50,
-    "humidity" : 45
-    }
+    "Temperature": 1,
+    "pressure": "thing",
+    "humidity": "thing",
+    "Air Quality ": "thing",
+    "Wind Speed": "thing",
+    "Wind Heading": "thing",
+    "Rain Rate": "thing"
+
+}
+
+exampleHistData = [{
+                "Temperature": 1,
+                "pressure": "thing",
+                "humidity": "thing",
+                "Air Quality ": "thing",
+                "Wind Speed": "thing",
+                "Wind Heading": "thing",
+                "Rain Rate": "thing"
+            },
+            {
+                "Temperature": 1,
+                "pressure": "thing",
+                "humidity": "thing",
+                "Air Quality ": "thing",
+                "Wind Speed": "thing",
+                "Wind Heading": "thing",
+                "Rain Rate": "thing"
+            },
+            {
+                "Temperature": 1,
+                "pressure": "thing",
+                "humidity": "thing",
+                "Air Quality ": "thing",
+                "Wind Speed": "thing",
+                "Wind Heading": "thing",
+                "Rain Rate": "thing"
+            }
+]
+
+
+
+
+#where to put shutdown
 
 @app.route('/')
 def hello_world():
@@ -26,12 +85,48 @@ def hello_world():
 @app.route("/get_data", methods=['GET', 'POST'])
 def get_data():
     #need to handle empty data here 
-    return exampleData
+
+    #Get updated data and put it into
+    #append current time again  
+    
     #params = {
-     #   'weather': request.get_json().get('weather')
+    #    request.get_json().get()
     #}
     #immediately call function to store it in the db 
-    #return json.dumps(params)
+   # return json.dumps(params)
+   exampleD = json.dumps(exampleData)
+   return exampleD
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func = get_data, trigger="interval", minutes = 60)
+
+
+
+
+#Write Data to Google Sheet
+def writeData():
+    row = []
+    #current time append
+    row.append(datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
+
+    data = json.loads(get_data())
+
+    
+    for item in data.items():
+        row.append(item[1])
+
+    index = 2
+    #error handling?
+    sheet.insert_row(row, index)
+
+    return 1
+
+scheduler.add_job(func = writeData, trigger="interval", minutes = 60)
+scheduler.start()
+
+@app.route("/get_histo", methods=['GET', 'POST'])
+def get_histo():
+    return exampleHistData
 
 # handle hsitory and store it 
 
@@ -56,3 +151,6 @@ def dated_url_for(endpoint, **values):
                                  endpoint, filename)
             values['q'] = int(os.stat(file_path).st_mtime)
     return url_for(endpoint, **values)
+
+
+#db controller and write to database with time stamp
