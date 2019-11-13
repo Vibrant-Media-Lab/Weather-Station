@@ -116,16 +116,58 @@
                     </li>
                   </ul>
                  <!--Status button or Time Stamp TODO-->
+                 <!-- Point is to have some sort of indication when new data is available-->
+                 <div class="clock">
+                     <div class="align">
+                         <a><span class="time hours"></span></a>:
+                         <a><span class="time minutes"></span></a>:
+                         <a><span class="time seconds"></span></a>
+
+
+
+                     </div>
+                 </div>
+                 <script>
+                     
+                    $(document).ready(function() {
+                    setInterval( function() {
+                    var hours = new Date().getHours();
+                    $(".hours").html(( hours < 10 ? "0" : "" ) + hours);
+                    }, 1000);
+                    setInterval( function() {
+                    var minutes = new Date().getMinutes();
+                    $(".minutes").html(( minutes < 10 ? "0" : "" ) + minutes);
+                    },1000);
+                    setInterval( function() {
+                    var seconds = new Date().getSeconds();
+                    $(".seconds").html(( seconds < 10 ? "0" : "" ) + seconds);
+                    },1000);
+                    });
+                 
+                 </script>
                 </div>
               </nav>
             </div>
         <div id="left"><h1 class="display-4">Current Readings</h1>
            
+            <div id="container-container">
+                <div class="embed-responsive embed-responsive-16by9">
+                        <a class="embed-responsive-item" href="https://www.wunderground.com/dashboard/pws/KPAPITTS391"><img src="http://banners.wunderground.com/cgi-bin/banner/ban/wxBanner?bannertype=pws250&weatherstationcount=KPAPITTS391" width="400" height="200" border="0" alt="Weather Underground PWS KPAPITTS391" /></a>
+        
+                </div>
+            </div>
+
+            <br />
+
             <div id="listcontainer"> 
             <ul class="list-group" id="currentweather">
                    
             </ul>
             </div>
+
+            
+    
+
         </div>
         <div id="right"><h1 class="display-4">Historical Readings</h1>
             <table class="table" id = "historical"> </table>
@@ -137,11 +179,7 @@
             <br />
 
 
-            <div class="embed-responsive embed-responsive-16by9">
-                <a class="embed-responsive-item" href="https://www.wunderground.com/dashboard/pws/KPAPITTS391"><img src="http://banners.wunderground.com/cgi-bin/banner/ban/wxBanner?bannertype=pws250&weatherstationcount=KPAPITTS391" width="400" height="200" border="0" alt="Weather Underground PWS KPAPITTS391" /></a>
-
-            </div>
-
+            
             
 
 
@@ -153,9 +191,10 @@
             var curtable = document.getElementById("currentweather");
             var histo = document.getElementById("historical");
 
-            //createTables();
+            createTables();
            // createHistoricalTable();
            //On Click requires double click
+           //Have Data automatically load - need to have thing get initial value 
         
         </script>
 
