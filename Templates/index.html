@@ -11,82 +11,66 @@
     </head>
 
     <script>
-        //send get request every hour
-        //run into sync problems getting from wStation.py every hour as well?
-        //could have them refresh themselves, say when the last time is was refreshed 
-        //the could be sync issues here, doing every 60 minutes if they are offsset and servers are run at different times 
-        
+
+        //variable for holding weatherInstance Data
+        /*
+            Weather Instance: A single set of readings taken from any hour
+
+        */         
         var buffd;
         
+        //Get weather instance from Flask asynchronously
         function getWeather(){
 
-            console.log("Get weather");
+            //console.log("Get weather");
 
             $.ajax({
                 type : "GET",
                 dataType: "json",
                 url : 'http://127.0.0.1:5000/get_data',
                 success: function (data) {
-                    //data = JSON.parse(data);
-                    console.log("gotten");
-                    //console.log(data);
+                   
                     attach(data);
-                    //buffd = JSON.parse(data);
-                    //console.log(buffd);
-                    //return data;
+                   
                 }, error: function(e){
                     console.log(e);
                 }
 	        });
-            /*var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if(this.readyState == 4 && this.status == 200){
-                    var currData = JSON.parse(xhttp.responseText);
-                }
-            };
-            xhttp.open("GET", "/get_data", true);
-            xhttp.send(); */
+           
         }
 
+        //attach data to buffd
         function attach(data){
             buffd = data;
-            //console.log(buffd)
+           
         }
 
-        function getHist(){
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if(this.readyState == 4 && this.status == 200){
-                    var histoWeatherData = JSON.parse(xhttp.responseText);
-                }
-            };
-            xhttp.open("GET", "/get_histo", true);
-            xhttp.send();
-        }
-
+       
+        //Create table for most recently gotten weather instance
         function createTables(){
-            //var weath = getWeather();
-            //console.log(weath)
+           
 
+            /*
+                Next two lines can be done much better
+            */
+
+            //call get weather
             getWeather();
 
-            //console.log(buffd)
+            //set weath to weather instance
             var weath = buffd;
 
-            //var exampleHistWeatherD = getHist();
+           
 
             //list of values
             var props = Object.getOwnPropertyNames(weath);
-            //console.log(props);
+            
            
-            console.log(weath)
-
+            
+            //delete already existing rows to prepare list to be redrawn
             document.getElementById("currentweather").innerHTML = "";
             
             for(var i = 0; i < props.length; i++){
-                //if already exists
-
-                
 
                 var listItem = document.createElement("li");
 
@@ -102,62 +86,12 @@
                 
             }
 
-            //createHistoricalTable();
-
            
-        }
-
-       
-       
-
-        function createHistoricalTable(){
-            var col = [];
-            for (var i = 0; i < exampleHistWeatherD.length; i++) {
-                for (var key in exampleHistWeatherD[i]) {
-                    if (col.indexOf(key) === -1) {
-                        col.push(key);
-                    }
-                }
-            }
-
-            // CREATE DYNAMIC TABLE.
-            var table = document.createElement("table");
-
-            // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
-
-            var tr = histo.insertRow(-1);                   // TABLE ROW.
-
-            for (var i = 0; i < col.length; i++) {
-                var th = document.createElement("th");      // TABLE HEADER.
-                th.innerHTML = col[i];
-                tr.appendChild(th);
-            }
-
-            // ADD JSON DATA TO THE TABLE AS ROWS.
-            for (var i = 0; i < exampleHistWeatherD.length; i++) {
-
-                tr = histo.insertRow(-1);
-
-                for (var j = 0; j < col.length; j++) {
-                    var tabCell = tr.insertCell(-1);
-                    tabCell.innerHTML = exampleHistWeatherD[i][col[j]];
-                }
-            }
-
-            // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
-            var divContainer = document.getElementById("showData");
-            divContainer.innerHTML = "";
-            divContainer.appendChild(histo);
-
-
         }
     
     </script>
 
     <body>
-        <!-- Added header area -->
-        <!-- add css to get the table aligned left-->
-        <!--<table class="outer" id="weatherDataTable"></table> -->
         <div id="top">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <a class="navbar-brand" href="#">VML Weather Station Data</a>
@@ -181,7 +115,7 @@
                         <button type="button" class="btn btn-primary" onclick=createTables()>Load Data/Refresh</button>
                     </li>
                   </ul>
-                 <!--Status button-->
+                 <!--Status button or Time Stamp TODO-->
                 </div>
               </nav>
             </div>
@@ -213,15 +147,15 @@
 
 
         </div>
-        <div id="bot"><p>Connor Lovejoy for VML Pitt</p></div>
-        <!-- use function from home.html to add data to table dynamically, also have this run every hour-->
-        <!-- have to call this function from the above http request function-->
+        <div id="bot"><p>Connor Lovejoy for VML @ Pitt</p></div>
+        
         <script>
             var curtable = document.getElementById("currentweather");
             var histo = document.getElementById("historical");
 
             //createTables();
            // createHistoricalTable();
+           //On Click requires double click
         
         </script>
 
