@@ -3,6 +3,7 @@ import json
 import os 
 import time
 import atexit
+import requests
 
 import gspread
 import datetime
@@ -17,8 +18,9 @@ scope = ['https://spreadsheets.google.com/feeds',
 creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 client = gspread.authorize(creds)
 
-
-sheet = client.open("VML WeatherStation Historical Data").sheet1
+#Close where?
+sheet = client.open("VML Hourly Data").sheet1
+sheet2 = client.open("VML Per Day Accumulations").sheet1
 
 
 
@@ -48,28 +50,52 @@ def hello_world():
 
 #TODO work with multiple weather nodes
 #TODO make timing more robust so there is no possibility of desyncronization and rewriting of same data 
+
 @app.route("/get_data", methods=['GET', 'POST'])
 def get_data():
     #need to handle empty data here 
     #Get updated data and put it into
-    #append current time again  
+    #append current time again 
+   url = "https://136.142.64.212:80" 
     
+    #Get Fixed IP
+    #Url in request will be fixed IP of ethernet 
+   r = requests.get(url)
+    #data = parse json of r, or in general figure out what r is 
+   #data = request.get_json(r)
+   
+
     #params = {
     #    request.get_json().get()
     #}
     #immediately call function to store it in the db 
    # return json.dumps(params)
+
    exampleD = json.dumps(exampleData)
    writeData(exampleD)
+   accum(exampleD)
    return exampleD
 
+#port 80 ip and mac 
 
+@app.route("/per_day", methods = ['GET', 'POST'])
+def per_day():
+    #take json and put values into array 
+    #return set with sum of most recent, only do this when there is new data
+    #only called then
+    # this just returns the array of the current state of the accumulation  
+    return 1
 
+def accum():
+    #add jsut gotten weather instance to the accumulation data struct 
+    #call write d
+    return 1
 
 
 
 #Write Data to Google Sheet
 #TODO Change this to write only when it gets new data 
+#SPlit into current and accumulation sheets 
 def writeData(jsonData):
     row = []
     #current time append
@@ -83,17 +109,37 @@ def writeData(jsonData):
 
     index = 2
     #error handling?
+    #fix where sheet is and how its called 
     sheet.insert_row(row, index)
 
     return 1
+
+def writePerDay(dataList):
+    row = []
+    #current time append
+    row.append(datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
+
+    data = dataList
+
+    
+    for item in data.items():
+        row.append(item[1])
+
+    index = 2
+    #error handling?
+    #fix where sheet is and how its called 
+    sheet2.insert_row(row, index)
+
+    return 1
+
 
 
 #Schedule Jobs to run every hour
 scheduler = BackgroundScheduler()
 #For testing purposes
-#scheduler.add_job(func = get_data, trigger="interval", seconds = 3)
+scheduler.add_job(func = get_data, trigger="interval", seconds = 3)
 
-scheduler.add_job(func = get_data, trigger="interval", minutes = 60)
+#scheduler.add_job(func = get_data, trigger="interval", minutes = 60)
 
 
 #originally had writeData as a job
