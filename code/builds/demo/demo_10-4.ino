@@ -90,7 +90,7 @@ bool hasEnet;
 
 // Network //
 byte mac[] = {0x2c, 0x77, 0x68, 0xc4, 0x91, 0x85};
-IPAddress ip();
+IPAddress ip(136, 142, 64, 212);
 EthernetServer server(80);
 
 
