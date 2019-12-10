@@ -1,6 +1,12 @@
 # Weather-Station
 Arduino Weather Station by the Pitt Vibrant Media Lab
 
+wStation.py contains all of python logic (getting, transforming, and serving the weather data) and code for building the web server 
+
+Templates/index.html is defines the home pages structure
+
+Static/main.css holds the css style sheets
+
 ## To run the app
 To run the application you can either use the flask command or python’s -m switch with Flask. Before you can do that you need to tell your terminal the application to work with by exporting the FLASK_APP environment variable:
 
