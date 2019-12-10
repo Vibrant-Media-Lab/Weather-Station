@@ -1,6 +1,12 @@
 # Weather-Station
 Arduino Weather Station by the Pitt Vibrant Media Lab
 
+This current branch holds the files necessary for running a web server that 
+
+1: Makes a HTTP request from an arduino for the weather date (JSON) at a defined interval using a Job Scheduler (currently 1 hour). 
+2: Takes weather data and serves it to a web site (so current readings are human readable). 
+3: Uploads this data to a Google Spreadsheet. 
+
 wStation.py contains all of python logic (getting, transforming, and serving the weather data) and code for building the web server 
 
 Templates/index.html is defines the home pages structure
