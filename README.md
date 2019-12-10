@@ -13,6 +13,7 @@ C:\path\to\app>set FLASK_APP=hello.py
 And on PowerShell:
 
 PS C:\path\to\app> $env:FLASK_APP = "hello.py"
+
 Alternatively you can use python -m flask:
 
 $ export FLASK_APP=hello.py
